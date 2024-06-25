@@ -9,7 +9,7 @@ from typing import Any, Callable, Literal, Protocol, Sequence
 
 class NinetailsVectorGymnasiumEnv:
     supported_observation_spaces: tuple[type[gym.Space], ...]
-        supported_action_spaces: tuple[type[gym.Space], ...]
+    supported_action_spaces: tuple[type[gym.Space], ...]
 
     def __init__(
         self,
