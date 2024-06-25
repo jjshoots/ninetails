@@ -9,9 +9,10 @@ import gymnasium as gym
 import numpy as np
 
 from ninetails.exceptions import SubProcessVectorEnvException
+from ninetails.protocol import NinetailsVectorGymnasiumEnv
 
 
-class PseudoSubProcessVectorGymnasiumEnv:
+class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
     """PseudoSubProcessVectorGymnasiumEnv.
 
     This has the same signature as SubProcessVectorGymnasiumEnv, but is only for 1 environment and is much faster.
@@ -93,15 +94,6 @@ class PseudoSubProcessVectorGymnasiumEnv:
             (info,),
         )
 
-    def _delete_spaces(self) -> None:
-        """_delete_spaces.
-
-        Returns:
-            None:
-        """
-        if hasattr(self, "action_spaces"):
-            del self.__dict__["action_spaces"]
-
     def reset(
         self, seed: None | int = None
     ) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
@@ -176,11 +168,3 @@ class PseudoSubProcessVectorGymnasiumEnv:
             Sequence[np.ndarray]:
         """
         return self._env.render()
-
-    def sample_actions(self) -> np.ndarray:
-        """sample_actions.
-
-        Returns:
-            np.ndarray:
-        """
-        return np.expand_dims(self.action_spaces[0].sample(), axis=0)

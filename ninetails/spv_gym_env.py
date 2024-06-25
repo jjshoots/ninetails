@@ -12,9 +12,10 @@ import numpy as np
 
 from ninetails.exceptions import SubProcessVectorEnvException
 from ninetails.process_utils import CloudpickleWrapper, process_worker
+from ninetails.protocol import NinetailsVectorGymnasiumEnv
 
 
-class SubProcessVectorGymnasiumEnv:
+class SubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
     """SubProcessVectorGymnasiumEnv.
 
     Creates a multiprocess vectorized wrapper for multiple gymnasium environments.
@@ -201,15 +202,6 @@ class SubProcessVectorGymnasiumEnv:
         # return things
         return obs, rews, terms, truncs, infos
 
-    def _delete_spaces(self) -> None:
-        """_delete_spaces.
-
-        Returns:
-            None:
-        """
-        if hasattr(self, "action_spaces"):
-            del self.__dict__["action_spaces"]
-
     def reset(
         self, seed: None | int = None
     ) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
@@ -309,11 +301,3 @@ class SubProcessVectorGymnasiumEnv:
         imgs = [pipe.recv() for pipe in self.pipes]
 
         return np.stack(imgs, axis=0)
-
-    def sample_actions(self) -> np.ndarray:
-        """sample_actions.
-
-        Returns:
-            np.ndarray:
-        """
-        return np.stack([space.sample() for space in self.action_spaces])
