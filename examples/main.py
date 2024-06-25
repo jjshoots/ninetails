@@ -8,8 +8,6 @@ from ninetails import SubProcessVectorGymnasiumEnv
 def main() -> None:
     """main.
 
-    Args:
-
     Returns:
         None:
     """
