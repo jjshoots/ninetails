@@ -47,7 +47,7 @@ def main() -> None:
         observations, rewards, terminations, truncations, infos = vec_env.step(actions)
 
         # to reset underlying environments
-        done_ids = set(np.where(terminations).tolist() + np.where(truncations).tolist())
+        done_ids = set(terminations.nonzero()[0].tolist() + truncations.nonzero()[0].tolist())
         for id in done_ids:
             # warning, you'll have to handle starting observations yourself here
             reset_obs, reset_info = vec_env.reset(id)
