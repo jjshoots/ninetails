@@ -6,7 +6,7 @@ import numpy as np
 
 
 def all_equal(obj1: Any, obj2: Any) -> bool:
-    """all_equal.
+    """Checks for exact object equality.
 
     Args:
         obj1 (Any): obj1

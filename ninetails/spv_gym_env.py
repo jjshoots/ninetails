@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 import multiprocessing
 from functools import cached_property
 from typing import Any, Callable, Literal, Sequence
@@ -50,6 +51,16 @@ class SubProcessVectorGymnasiumEnv:
         """
         self.strict = strict
         self.num_envs = len(env_fns)
+
+        if self.num_envs == 1:
+            warnings.warn(
+                "You are attempting to create a vector environment with only 1 environment.\n"
+                "This is probably undesirable and will create a fairly significant slowdown.\n"
+                "We advise that you use `PseudoSubProcessVectorGymnasiumEnv` instead if the desired goal is the same signature but for 1 environment:\n"
+                "\n"
+                "from ninetails import PseudoSubProcessVectorGymnasiumEnv"
+                "env = PseudoSubProcessVectorGymnasiumEnv(env_fn)"
+            )
 
         self.waiting = False
         self.closed = False
@@ -123,14 +134,14 @@ class SubProcessVectorGymnasiumEnv:
 
     def step(
         self, actions: np.ndarray | Sequence[np.ndarray]
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, tuple[dict[str, Any]]]:
         """step.
 
         Args:
             actions (np.ndarray | Sequence[np.ndarray]): actions
 
         Returns:
-            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
+            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, tuple[dict[str, Any]]]:
         """
         self._send_actions(actions)
         return self._receive_transitions()
@@ -162,11 +173,11 @@ class SubProcessVectorGymnasiumEnv:
 
     def _receive_transitions(
         self,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, tuple[dict[str, Any]]]:
         """recv_transition.
 
         Returns:
-            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
+            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, tuple[dict[str, Any]]]:
         """
         # collect the results from the remote
         results = [pipe.recv() for pipe in self.pipes]
@@ -199,15 +210,19 @@ class SubProcessVectorGymnasiumEnv:
         if hasattr(self, "action_spaces"):
             del self.__dict__["action_spaces"]
 
-    def reset(self, seed: None | int = None) -> tuple[np.ndarray, list[dict[str, Any]]]:
+    def reset(self, seed: None | int = None) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
         """reset.
 
         Args:
             seed (None | int): seed
 
         Returns:
-            tuple[np.ndarray, list[dict[str, Any]]]:
+            tuple[np.ndarray, tuple[dict[str, Any]]]:
         """
+        # on reset, we need to reset the observation and action spaces
+        # this does not affect the spaces of envs not seeded
+        self._delete_spaces()
+
         for pipe in self.pipes:
             pipe.send(("reset", seed))
         results = [pipe.recv() for pipe in self.pipes]
@@ -216,23 +231,29 @@ class SubProcessVectorGymnasiumEnv:
         obs, infos = zip(*results)
         obs = np.stack(obs, axis=0)
 
-        # on reset, we need to reset the observation and action spaces
-        self._delete_spaces()
+        # check the observation space
+        if self.strict:
+            for i, (ob, space) in enumerate(zip(obs, self.action_spaces)):
+                if not space.contains(ob):
+                    SubProcessVectorEnvException(
+                        f"Observation space of environment {i} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init"
+                    )
 
         return obs, infos
 
-    def reset_single_env(self, env_idx: int) -> tuple[np.ndarray, dict[str, Any]]:
+    def reset_single_env(self, env_idx: int, seed: None | int = None) -> tuple[np.ndarray, dict[str, Any]]:
         """reset_single_env.
 
         Args:
             env_idx (int): env_idx
+            seed (None | int): seed
         """
         # on reset, we need to reset the observation and action spaces
         # this does not affect the spaces of envs not seeded
         self._delete_spaces()
 
         pipe = self.pipes[env_idx]
-        pipe.send(("reset", None))
+        pipe.send(("reset", seed))
         ob, info = pipe.recv()
 
         # check the observation space

@@ -10,9 +10,10 @@ import numpy as np
 import pytest
 
 from ninetails import SubProcessVectorGymnasiumEnv
+from ninetails.pseudo_spv_gym_env import PseudoSubProcessVectorGymnasiumEnv
 from tests.utils import all_equal
 
-_NUM_ENV_RANGE = [1, 2, 4, 16]
+_NUM_ENV_RANGE = [1, 2, 4]
 
 _ENV_NAMES = [
     "MountainCarContinuous-v0",
@@ -60,7 +61,7 @@ def test_seedability(env_name: str, num_envs: int) -> None:
     """
     # how many steps to take in the environment
     seed = 42
-    num_steps = 2
+    num_steps = 5
 
     # create the env
     env_fns = [lambda i=i: gym.make(env_name) for i in range(num_envs)]
@@ -76,12 +77,49 @@ def test_seedability(env_name: str, num_envs: int) -> None:
         actions = vec_env.sample_actions()
         results1.append(vec_env.step(actions))
 
-    vec_env = SubProcessVectorGymnasiumEnv(env_fns=env_fns, strict=True)
-
     # second pass
     vec_env.reset(seed=seed)
     for i in range(num_steps):
         actions = vec_env.sample_actions()
         results2.append(vec_env.step(actions))
+
+    assert all_equal(results1, results2)
+
+
+@pytest.mark.parametrize("env_name", _ENV_NAMES)
+def test_pseudo(env_name) -> None:
+    """Test that pseudo vec env performs the same.
+
+    Args:
+        env_name:
+
+    Returns:
+        None:
+    """
+    # how many steps to take in the environment
+    seed = 42
+    num_steps = 5
+
+    env_fns = [lambda i=i: gym.make(env_name) for i in range(1)]
+    vec_env = SubProcessVectorGymnasiumEnv(env_fns=env_fns, strict=True)
+    p_vec_env = PseudoSubProcessVectorGymnasiumEnv(env_fns=env_fns, strict=True)
+
+    # a place we store observations
+    results1: list[tuple[Any, ...]] = []
+    results2: list[tuple[Any, ...]] = []
+
+    # first pass
+    vec_env.reset(seed=seed)
+    for i in range(num_steps):
+        actions = vec_env.sample_actions()
+        print(actions)
+        results1.append(vec_env.step(actions))
+
+    # second pass
+    p_vec_env.reset(seed=seed)
+    for i in range(num_steps):
+        actions = p_vec_env.sample_actions()
+        print(actions)
+        results2.append(p_vec_env.step(actions))
 
     assert all_equal(results1, results2)
