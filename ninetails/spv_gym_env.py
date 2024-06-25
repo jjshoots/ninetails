@@ -162,7 +162,7 @@ class SubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
             for i, (action, space) in enumerate(zip(actions, self.action_spaces)):
                 if not space.contains(action):
                     SubProcessVectorEnvException(
-                        f"Action space of environment {i} ({space}) does not contain {action=}. To disable this check, set `strict=False` on init"
+                        f"Action space of environment {i} ({space}) does not contain {action=}. To disable this check, set `strict=False` on init."
                     )
 
         # pass the action to the remote through the pipe
@@ -196,7 +196,7 @@ class SubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
             for i, (ob, space) in enumerate(zip(obs, self.action_spaces)):
                 if not space.contains(ob):
                     SubProcessVectorEnvException(
-                        f"Observation space of environment {i} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init"
+                        f"Observation space of environment {i} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init."
                     )
 
         # return things
@@ -230,7 +230,7 @@ class SubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
             for i, (ob, space) in enumerate(zip(obs, self.action_spaces)):
                 if not space.contains(ob):
                     SubProcessVectorEnvException(
-                        f"Observation space of environment {i} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init"
+                        f"Observation space of environment {i} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init."
                     )
 
         return obs, infos
@@ -257,10 +257,30 @@ class SubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
             space = self.observation_spaces[env_idx]
             if not space.contains(ob):
                 SubProcessVectorEnvException(
-                    f"Observation space of environment {env_idx} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init"
+                    f"Observation space of environment {env_idx} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init."
                 )
 
         return ob, info
+
+    def sample_actions(self) -> np.ndarray:
+        """sample_actions.
+
+        Returns:
+            np.ndarray:
+        """
+        for pipe in self.pipes:
+            pipe.send(("sample_action", None))
+        actions = [pipe.recv() for pipe in self.pipes]
+
+        # check the observation space
+        if self.strict:
+            for env_idx, (action, space) in enumerate(zip(actions, self.action_spaces)):
+                if not space.contains(action):
+                    SubProcessVectorEnvException(
+                        f"Action space of environment {env_idx} ({space}) does not contain {action=}. To disable this check, set `strict=False` on init."
+                    )
+
+        return np.stack(actions, axis=0)
 
     def close(self) -> None:
         """close.

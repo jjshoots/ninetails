@@ -75,7 +75,7 @@ class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
             action = actions[0]
             if not self.action_spaces[0].contains(action):
                 SubProcessVectorEnvException(
-                    f"Action space of environment 0 ({self.action_spaces[0]}) does not contain {action=}. To disable this check, set `strict=False` on init"
+                    f"Action space of environment 0 ({self.action_spaces[0]}) does not contain {action=}. To disable this check, set `strict=False` on init."
                 )
 
         obs, rew, term, trunc, info = self._env.step(actions[0])
@@ -83,7 +83,7 @@ class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
         if self.strict:
             if not self.observation_spaces[0].contains(obs):
                 SubProcessVectorEnvException(
-                    f"Observation space of environment 0 ({self.observation_spaces[0]}) does not contain {obs=}. To disable this check, set `strict=False` on init"
+                    f"Observation space of environment 0 ({self.observation_spaces[0]}) does not contain {obs=}. To disable this check, set `strict=False` on init."
                 )
 
         return (
@@ -93,6 +93,14 @@ class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
             np.expand_dims(trunc, axis=0),
             (info,),
         )
+
+    def sample_actions(self) -> np.ndarray:
+        """sample_actions.
+
+        Returns:
+            np.ndarray:
+        """
+        return np.stack([space.sample() for space in self.action_spaces], axis=0)
 
     def reset(
         self, seed: None | int = None
@@ -116,7 +124,7 @@ class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
         if self.strict:
             if not self.observation_spaces[0].contains(obs):
                 SubProcessVectorEnvException(
-                    f"Observation space of environment 0 ({self.observation_spaces[0]}) does not contain {obs=}. To disable this check, set `strict=False` on init"
+                    f"Observation space of environment 0 ({self.observation_spaces[0]}) does not contain {obs=}. To disable this check, set `strict=False` on init."
                 )
 
         return (
@@ -145,7 +153,7 @@ class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
         if self.strict:
             if not self.observation_spaces[0].contains(obs):
                 SubProcessVectorEnvException(
-                    f"Observation space of environment 0 ({self.observation_spaces[0]}) does not contain {obs=}. To disable this check, set `strict=False` on init"
+                    f"Observation space of environment 0 ({self.observation_spaces[0]}) does not contain {obs=}. To disable this check, set `strict=False` on init."
                 )
 
         return obs, info

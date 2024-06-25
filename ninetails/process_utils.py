@@ -74,6 +74,8 @@ def process_worker(
                 remote.send(env.action_space)
             elif cmd == "get_observation_space":
                 remote.send(env.observation_space)
+            elif cmd == "sample_action":
+                remote.send(env.action_space.sample())
             elif cmd == "get_attr":
                 remote.send(getattr(env, data))
             elif cmd == "set_attr":

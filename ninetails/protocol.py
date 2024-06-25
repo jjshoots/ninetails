@@ -39,14 +39,6 @@ class NinetailsVectorGymnasiumEnv:
         if hasattr(self, "action_spaces"):
             del self.__dict__["action_spaces"]
 
-    def sample_actions(self) -> np.ndarray:
-        """sample_actions.
-
-        Returns:
-            np.ndarray:
-        """
-        return np.stack([space.sample() for space in self.action_spaces], axis=0)
-
     @cached_property
     def observation_spaces(self) -> list[gym.spaces.Space]:
         """observation_spaces.
