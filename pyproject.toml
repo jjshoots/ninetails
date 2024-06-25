@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "spv-gymnasium"
+version = "0.1.0"
+description = ""
+authors = ["Jet <junjet.tai@sony.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^8.2.2"
+gymnasium = "^0.29.1"
+cloudpickle = "^3.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
