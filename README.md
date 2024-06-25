@@ -2,7 +2,11 @@
 
 A wrapper for creating vectorized gymnasium environments.
 
-### Usage
+## Installation
+
+`pip3 install ninetails`
+
+## Usage
 
 ```py
 import gymnasium as gym
