@@ -1,5 +1,5 @@
-class SPVEnvException(Exception):
-    """SPVEnvException."""
+class SubProcessVectorEnvException(Exception):
+    """SubProcessVectorEnvException."""
 
     def __init__(self, message: str):
         """__init__.

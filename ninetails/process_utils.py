@@ -42,11 +42,10 @@ def process_worker(
             if cmd == "step":
                 observation, reward, terminated, truncated, info = env.step(data)
                 remote.send((observation, reward, terminated, truncated, info))
-            elif cmd == "seed":
-                remote.send(env.seed(data))
-                remote.send(env.action_space.seed(data))
             elif cmd == "reset":
-                observation, info = env.reset()
+                observation, info = env.reset(seed=data)
+                if data:
+                    env.action_space.seed(data)
                 remote.send((observation, info))
             elif cmd == "render":
                 remote.send(env.render(**data))

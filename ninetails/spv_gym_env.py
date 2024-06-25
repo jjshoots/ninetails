@@ -7,8 +7,8 @@ from typing import Any, Callable, Literal, Sequence
 import gymnasium as gym
 import numpy as np
 
-from spv_gymnasium.exceptions import SPVEnvException
-from spv_gymnasium.process_utils import CloudpickleWrapper, process_worker
+from ninetails.exceptions import SubProcessVectorEnvException
+from ninetails.process_utils import CloudpickleWrapper, process_worker
 
 
 class SubProcessVectorGymnasiumEnv:
@@ -29,6 +29,9 @@ class SubProcessVectorGymnasiumEnv:
         ``if __name__ == "__main__":`` block.
         For more information, see the multiprocessing documentation.
     """
+
+    supported_observation_spaces = (gym.spaces.Box, gym.spaces.Discrete)
+    supported_action_spaces = (gym.spaces.Box, gym.spaces.Discrete)
 
     def __init__(
         self,
@@ -80,13 +83,13 @@ class SubProcessVectorGymnasiumEnv:
 
         # check that the action and observation spaces are np arrays
         for i, space in enumerate(self.observation_spaces):
-            if not isinstance(space, gym.spaces.Box):
-                raise SPVEnvException(
+            if not isinstance(space, self.supported_observation_spaces):
+                raise SubProcessVectorEnvException(
                     f"Usage of SubProcVecEnv requires that observation spaces are `gymnasium.spaces.Box` type, got {space=} for environment {i}."
                 )
         for i, space in enumerate(self.action_spaces):
-            if not isinstance(space, gym.spaces.Box):
-                raise SPVEnvException(
+            if not isinstance(space, self.supported_action_spaces):
+                raise SubProcessVectorEnvException(
                     f"Usage of SubProcVecEnv requires that action spaces are `gymnasium.spaces.Box` type, got {space=} for environment {i}."
                 )
 
@@ -120,7 +123,21 @@ class SubProcessVectorGymnasiumEnv:
             pipe.send(("get_action_space", None))
         return [pipe.recv() for pipe in self.pipes]
 
-    def send_actions(self, actions: np.ndarray | Sequence[np.ndarray]) -> None:
+    def step(
+        self, actions: np.ndarray | Sequence[np.ndarray]
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
+        """step.
+
+        Args:
+            actions (np.ndarray | Sequence[np.ndarray]): actions
+
+        Returns:
+            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
+        """
+        self._send_actions(actions)
+        return self._receive_transitions()
+
+    def _send_actions(self, actions: np.ndarray | Sequence[np.ndarray]) -> None:
         """Sends a list of actions to each environment.
 
         Args:
@@ -134,7 +151,7 @@ class SubProcessVectorGymnasiumEnv:
             assert len(actions) == self.num_envs
             for i, (action, space) in enumerate(zip(actions, self.action_spaces)):
                 if not space.contains(action):
-                    SPVEnvException(
+                    SubProcessVectorEnvException(
                         f"Action space of environment {i} ({space}) does not contain {action=}. To disable this check, set `strict=False` on init"
                     )
 
@@ -145,7 +162,7 @@ class SubProcessVectorGymnasiumEnv:
         # flag that we are waiting
         self.waiting = True
 
-    def recv_transition(
+    def _receive_transitions(
         self,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
         """recv_transition.
@@ -170,45 +187,35 @@ class SubProcessVectorGymnasiumEnv:
         if self.strict:
             for i, (ob, space) in enumerate(zip(obs, self.action_spaces)):
                 if not space.contains(ob):
-                    SPVEnvException(
+                    SubProcessVectorEnvException(
                         f"Observation space of environment {i} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init"
                     )
 
         # return things
         return obs, rews, terms, truncs, infos
 
-    def seed(self, seed: int | Sequence[int] | np.ndarray) -> None:
-        """seed.
+    def _delete_spaces(self) -> None:
+        """_delete_spaces.
 
         Args:
-            seed (int | Sequence[int] | np.ndarray): seed
 
         Returns:
             None:
         """
-        # on seed, we need to reset the observation and action spaces
-        del self.__dict__["observation_spaces"]
-        del self.__dict__["action_spaces"]
+        if hasattr(self, "action_spaces"):
+            del self.__dict__["action_spaces"]
 
-        # if only one number given, increment ourself
-        if not isinstance(seed, (Sequence, np.ndarray)):
-            seed = [seed + i for i in range(self.num_envs)]
-
-        for pipe in self.pipes:
-            pipe.send(("seed", seed))
-
-        [pipe.recv() for pipe in self.pipes]
-
-    def reset(self) -> tuple[np.ndarray, list[dict[str, Any]]]:
+    def reset(self, seed: None | int = None) -> tuple[np.ndarray, list[dict[str, Any]]]:
         """reset.
 
         Args:
+            seed (None | int): seed
 
         Returns:
             tuple[np.ndarray, list[dict[str, Any]]]:
         """
         for pipe in self.pipes:
-            pipe.send(("reset", None))
+            pipe.send(("reset", seed))
         results = [pipe.recv() for pipe in self.pipes]
 
         # unpack the results
@@ -216,8 +223,7 @@ class SubProcessVectorGymnasiumEnv:
         obs = np.stack(obs, axis=0)
 
         # on reset, we need to reset the observation and action spaces
-        del self.__dict__["observation_spaces"]
-        del self.__dict__["action_spaces"]
+        self._delete_spaces()
 
         return obs, infos
 
@@ -229,8 +235,7 @@ class SubProcessVectorGymnasiumEnv:
         """
         # on reset, we need to reset the observation and action spaces
         # this does not affect the spaces of envs not seeded
-        del self.__dict__["observation_spaces"]
-        del self.__dict__["action_spaces"]
+        self._delete_spaces()
 
         pipe = self.pipes[env_idx]
         pipe.send(("reset", None))
@@ -240,7 +245,7 @@ class SubProcessVectorGymnasiumEnv:
         if self.strict:
             space = self.observation_spaces[env_idx]
             if not space.contains(ob):
-                SPVEnvException(
+                SubProcessVectorEnvException(
                     f"Observation space of environment {env_idx} ({space}) does not contain {ob=}. To disable this check, set `strict=False` on init"
                 )
 

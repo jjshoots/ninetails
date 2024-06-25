@@ -1,18 +1,19 @@
 import gymnasium as gym
+import numpy as np
 
-from spv_gymnasium import SubProcessVectorGymnasiumEnv
+from ninetails import SubProcessVectorGymnasiumEnv
 
 
 def main() -> None:
-    env_fns = [lambda i=i: gym.make("CarRacing-v2") for i in range(16)]
+    env_fns = [lambda i=i: gym.make("MountainCarContinuous-v0") for i in range(1)]
     vec_env = SubProcessVectorGymnasiumEnv(env_fns=env_fns, strict=True)
 
-    term, trunc = False, False
+    terminations, truncations = np.array([False]), np.array([False])
     observations, infos = vec_env.reset()
 
-    print(observations)
-    print(observations.shape)
-    print(infos)
+    while not np.any(terminations) and not np.any(truncations):
+        actions = vec_env.sample_actions()
+        observations, rewards, terminations, truncations, infos = vec_env.step(actions)
 
 
 if __name__ == "__main__":
