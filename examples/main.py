@@ -11,7 +11,7 @@ def main() -> None:
     Returns:
         None:
     """
-    env_fns = [lambda i=i: gym.make("MountainCarContinuous-v0") for i in range(1)]
+    env_fns = [lambda i=i: gym.make("MountainCarContinuous-v0") for i in range(4)]
     vec_env = SubProcessVectorGymnasiumEnv(env_fns=env_fns, strict=True)
 
     terminations, truncations = np.array([False]), np.array([False])
