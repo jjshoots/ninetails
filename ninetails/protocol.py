@@ -19,19 +19,6 @@ class NinetailsVectorGymnasiumEnv:
     ):
         raise NotImplementedError
 
-    @cached_property
-    def observation_spaces(self) -> list[gym.spaces.Space]:
-        raise NotImplementedError
-
-    @cached_property
-    def action_spaces(self) -> list[gym.spaces.Space]:
-        raise NotImplementedError
-
-    def step(
-        self, actions: np.ndarray | Sequence[np.ndarray]
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, tuple[dict[str, Any]]]:
-        raise NotImplementedError
-
     def _delete_spaces(self) -> None:
         """_delete_spaces.
 
@@ -48,6 +35,19 @@ class NinetailsVectorGymnasiumEnv:
             np.ndarray:
         """
         return np.stack([space.sample() for space in self.action_spaces], axis=0)
+
+    @cached_property
+    def observation_spaces(self) -> list[gym.spaces.Space]:
+        raise NotImplementedError
+
+    @cached_property
+    def action_spaces(self) -> list[gym.spaces.Space]:
+        raise NotImplementedError
+
+    def step(
+        self, actions: np.ndarray | Sequence[np.ndarray]
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, tuple[dict[str, Any]]]:
+        raise NotImplementedError
 
     def reset(
         self, seed: None | int
