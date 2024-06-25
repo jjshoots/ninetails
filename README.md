@@ -22,7 +22,7 @@ def main() -> None:
         None:
     """
     # define your environment using a function that returns the environment here
-    env_fns = [lambda i=i: gym.make("MountainCarContinuous-v0") for i in range(1)]
+    env_fns = [lambda i=i: gym.make("MountainCarContinuous-v0") for i in range(4)]
 
     # create a vectorized environment
     # `strict` is useful here for debugging
