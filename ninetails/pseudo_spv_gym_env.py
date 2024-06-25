@@ -43,10 +43,20 @@ class PseudoSubProcessVectorGymnasiumEnv:
 
     @cached_property
     def observation_spaces(self) -> list[gym.spaces.Space]:
+        """observation_spaces.
+
+        Returns:
+            list[gym.spaces.Space]:
+        """
         return [self._env.observation_space]
 
     @cached_property
     def action_spaces(self) -> list[gym.spaces.Space]:
+        """action_spaces.
+
+        Returns:
+            list[gym.spaces.Space]:
+        """
         return [self._env.action_space]
 
     def step(
@@ -92,7 +102,9 @@ class PseudoSubProcessVectorGymnasiumEnv:
         if hasattr(self, "action_spaces"):
             del self.__dict__["action_spaces"]
 
-    def reset(self, seed: None | int = None) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
+    def reset(
+        self, seed: None | int = None
+    ) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
         """reset.
 
         Args:
@@ -120,17 +132,20 @@ class PseudoSubProcessVectorGymnasiumEnv:
             (info,),
         )
 
-    def reset_single_env(self, env_idx: int, seed: None | int) -> tuple[np.ndarray, dict[str, Any]]:
+    def reset_single_env(
+        self, env_idx: int, seed: None | int
+    ) -> tuple[np.ndarray, dict[str, Any]]:
         """reset_single_env.
 
         Args:
             env_idx (int): env_idx
+            seed (None | int): seed
         """
         # on reset, we need to reset the observation and action spaces
         # this does not affect the spaces of envs not seeded
         self._delete_spaces()
 
-        assert env_idx == 0, f"No other environment except index 0"
+        assert env_idx == 0, "No other environment except index 0"
         obs, info = self._env.reset(seed=seed)
         self._env.action_space.seed(seed=seed)
 

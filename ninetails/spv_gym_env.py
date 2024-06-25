@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import warnings
 import multiprocessing
+import warnings
 from functools import cached_property
 from typing import Any, Callable, Literal, Sequence
 
@@ -210,7 +210,9 @@ class SubProcessVectorGymnasiumEnv:
         if hasattr(self, "action_spaces"):
             del self.__dict__["action_spaces"]
 
-    def reset(self, seed: None | int = None) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
+    def reset(
+        self, seed: None | int = None
+    ) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
         """reset.
 
         Args:
@@ -241,7 +243,9 @@ class SubProcessVectorGymnasiumEnv:
 
         return obs, infos
 
-    def reset_single_env(self, env_idx: int, seed: None | int = None) -> tuple[np.ndarray, dict[str, Any]]:
+    def reset_single_env(
+        self, env_idx: int, seed: None | int = None
+    ) -> tuple[np.ndarray, dict[str, Any]]:
         """reset_single_env.
 
         Args:

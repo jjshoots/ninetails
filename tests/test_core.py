@@ -87,11 +87,11 @@ def test_seedability(env_name: str, num_envs: int) -> None:
 
 
 @pytest.mark.parametrize("env_name", _ENV_NAMES)
-def test_pseudo(env_name) -> None:
+def test_pseudo(env_name: str) -> None:
     """Test that pseudo vec env performs the same.
 
     Args:
-        env_name:
+        env_name (str): env_name
 
     Returns:
         None:
