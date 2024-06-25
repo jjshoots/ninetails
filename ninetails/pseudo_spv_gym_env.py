@@ -125,7 +125,7 @@ class PseudoSubProcessVectorGymnasiumEnv(NinetailsVectorGymnasiumEnv):
         )
 
     def reset_single_env(
-        self, env_idx: int, seed: None | int
+        self, env_idx: int, seed: None | int = None
     ) -> tuple[np.ndarray, dict[str, Any]]:
         """reset_single_env.
 

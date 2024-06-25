@@ -78,7 +78,9 @@ class NinetailsVectorGymnasiumEnv:
         """
         raise NotImplementedError
 
-    def reset(self, seed: None | int) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
+    def reset(
+        self, seed: None | int = None
+    ) -> tuple[np.ndarray, tuple[dict[str, Any]]]:
         """reset.
 
         Args:
@@ -90,7 +92,7 @@ class NinetailsVectorGymnasiumEnv:
         raise NotImplementedError
 
     def reset_single_env(
-        self, env_idx: int, seed: None | int
+        self, env_idx: int, seed: None | int = None
     ) -> tuple[np.ndarray, dict[str, Any]]:
         """reset_single_env.
 
