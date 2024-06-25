@@ -9,8 +9,7 @@ import gymnasium as gym
 import numpy as np
 import pytest
 
-from ninetails import SubProcessVectorGymnasiumEnv
-from ninetails.pseudo_spv_gym_env import PseudoSubProcessVectorGymnasiumEnv
+from ninetails import PseudoSubProcessVectorGymnasiumEnv, SubProcessVectorGymnasiumEnv
 from tests.utils import all_equal
 
 _NUM_ENV_RANGE = [1, 2, 4]
