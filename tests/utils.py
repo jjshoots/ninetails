@@ -1,9 +1,20 @@
+"""Utils used during testing."""
+
 from typing import Any
 
 import numpy as np
 
 
 def all_equal(obj1: Any, obj2: Any) -> bool:
+    """all_equal.
+
+    Args:
+        obj1 (Any): obj1
+        obj2 (Any): obj2
+
+    Returns:
+        bool:
+    """
     # if both objects are of different types, they can't be equivalent
     if type(obj1) != type(obj2):
         return False

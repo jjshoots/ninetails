@@ -1,3 +1,6 @@
+"""Exception classes."""
+
+
 class SubProcessVectorEnvException(Exception):
     """SubProcessVectorEnvException."""
 

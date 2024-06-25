@@ -1,3 +1,5 @@
+"""Core tests."""
+
 from __future__ import annotations
 
 import itertools
@@ -21,12 +23,15 @@ _ENV_NAMES = [
 @pytest.mark.parametrize(
     "env_name, num_envs", itertools.product(_ENV_NAMES, _NUM_ENV_RANGE)
 )
-def test_core(env_name, num_envs):
+def test_core(env_name: str, num_envs: int) -> None:
     """Test that the core functionality works.
 
     Args:
-        env_name:
-        num_envs:
+        env_name (str): env_name
+        num_envs (int): num_envs
+
+    Returns:
+        None:
     """
     # create the env
     env_fns = [lambda i=i: gym.make(env_name) for i in range(num_envs)]
@@ -43,12 +48,15 @@ def test_core(env_name, num_envs):
 
 
 @pytest.mark.parametrize("env_name, num_envs", itertools.product(_ENV_NAMES, [1]))
-def test_seedability(env_name, num_envs):
+def test_seedability(env_name: str, num_envs: int) -> None:
     """Test that seeding works.
 
     Args:
-        env_name:
-        num_envs:
+        env_name (str): env_name
+        num_envs (int): num_envs
+
+    Returns:
+        None:
     """
     # how many steps to take in the environment
     seed = 42

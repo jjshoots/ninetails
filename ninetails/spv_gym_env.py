@@ -1,3 +1,5 @@
+"""The main class for ninetails."""
+
 from __future__ import annotations
 
 import multiprocessing
@@ -99,8 +101,6 @@ class SubProcessVectorGymnasiumEnv:
 
         This effectively creates an identical copy of all the env spaces.
 
-        Args:
-
         Returns:
             list[gym.spaces.Space]:
         """
@@ -113,8 +113,6 @@ class SubProcessVectorGymnasiumEnv:
         """Get a list of action spaces of all the underlying envs.
 
         This effectively creates an identical copy of all the env spaces.
-
-        Args:
 
         Returns:
             list[gym.spaces.Space]:
@@ -167,8 +165,6 @@ class SubProcessVectorGymnasiumEnv:
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
         """recv_transition.
 
-        Args:
-
         Returns:
             tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]]]:
         """
@@ -196,8 +192,6 @@ class SubProcessVectorGymnasiumEnv:
 
     def _delete_spaces(self) -> None:
         """_delete_spaces.
-
-        Args:
 
         Returns:
             None:
@@ -254,8 +248,6 @@ class SubProcessVectorGymnasiumEnv:
     def close(self) -> None:
         """close.
 
-        Args:
-
         Returns:
             None:
         """
@@ -278,11 +270,11 @@ class SubProcessVectorGymnasiumEnv:
 
         self.closed = True
 
-    def render(self, **kwargs) -> np.ndarray:
+    def render(self, **kwargs: Any) -> np.ndarray:
         """render.
 
         Args:
-            kwargs:
+            kwargs (Any): kwargs
 
         Returns:
             Sequence[np.ndarray]:
@@ -295,8 +287,6 @@ class SubProcessVectorGymnasiumEnv:
 
     def sample_actions(self) -> np.ndarray:
         """sample_actions.
-
-        Args:
 
         Returns:
             np.ndarray:

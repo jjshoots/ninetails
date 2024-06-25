@@ -1,3 +1,4 @@
+"""Example usage of ninetails."""
 import gymnasium as gym
 import numpy as np
 
@@ -5,6 +6,13 @@ from ninetails import SubProcessVectorGymnasiumEnv
 
 
 def main() -> None:
+    """main.
+
+    Args:
+
+    Returns:
+        None:
+    """
     env_fns = [lambda i=i: gym.make("MountainCarContinuous-v0") for i in range(1)]
     vec_env = SubProcessVectorGymnasiumEnv(env_fns=env_fns, strict=True)
 

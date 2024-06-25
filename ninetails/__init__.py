@@ -1,2 +1,2 @@
 # ruff: noqa
-from .ninetails import SubProcessVectorGymnasiumEnv
+from .spv_gym_env import SubProcessVectorGymnasiumEnv
