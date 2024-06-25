@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ninetails"
-version = "0.0.6"
+version = "0.0.8"
 description = "Wrapper for creating vectorized gymnasium environments."
 authors = [
   { name="Jet", email="taijunjet@hotmail.com" },
